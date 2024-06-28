@@ -25,6 +25,25 @@ class _ProductListScreenState extends State<SellerPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text('My Product'),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.add),
+            onPressed: () async {
+              final newProduct = await Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => AddProductForm(),
+                ),
+              );
+
+              if (newProduct != null) {
+                setState(() {
+                  _products.add(newProduct);
+                });
+              }
+            },
+          ),
+        ],
       ),
       body: ListView.builder(
         itemCount: _products.length,
@@ -76,27 +95,6 @@ class _ProductListScreenState extends State<SellerPage> {
             },
           );
         },
-      ),
-      floatingActionButton: Padding(
-        padding: EdgeInsets.only(right: 90.0, bottom: 50),
-        child: FloatingActionButton(
-          onPressed: () async {
-            final newProduct = await Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => AddProductForm(),
-              ),
-            );
-
-            if (newProduct != null) {
-              setState(() {
-                _products.add(newProduct);
-              });
-            }
-          },
-          child: Icon(Icons.add),
-          backgroundColor: Colors.blue,
-        ),
       ),
     );
   }

@@ -178,7 +178,7 @@ class _CustomerHomePage2State extends State<CustomerHomePage2> {
               children: [
                 TextButton(
                   child: Text(
-                    'Profil Saya',
+                    'My Profile',
                     style: TextStyle(color: Colors.black),
                   ),
                   onPressed: () {

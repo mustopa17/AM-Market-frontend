@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
-import 'package:projek_uas/custommerpage.dart';
 
 import 'login_page.dart';
 
@@ -25,10 +24,10 @@ class _MyProfilePageState extends State<MyProfilePage> {
   @override
   void initState() {
     super.initState();
-    fetchProfileData();
+    _fetchProfileData();
   }
 
-  Future<void> fetchProfileData() async {
+  Future<void> _fetchProfileData() async {
     try {
       final token = await storage.read(key: 'auth_token');
       if (token == null) {
@@ -51,13 +50,10 @@ class _MyProfilePageState extends State<MyProfilePage> {
           address = userData['address'] ?? '';
         });
       } else {
-        throw Exception(
-            'Failed to fetch user data. Status code: ${response.statusCode}');
+        throw Exception(' ${response.statusCode}');
       }
     } catch (e) {
-      setState(() {
-        _errorMessage = 'Error fetching user data: $e';
-      });
+      setState(() {});
     }
   }
 
@@ -66,7 +62,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
       await storage.delete(key: 'auth_token');
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => CustomerHomePage()),
+        MaterialPageRoute(builder: (context) => LoginPage()),
       );
     } catch (e) {
       setState(() {
@@ -80,7 +76,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
       try {
         final token = await storage.read(key: 'auth_token');
         if (token == null) {
-          throw Exception('Token is null');
+          throw Exception('');
         }
         final response = await http.put(
           Uri.parse('http://localhost:8000/api/user'),
@@ -101,16 +97,15 @@ class _MyProfilePageState extends State<MyProfilePage> {
             isEditing = false;
           });
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Data Berhasil Disimpan')),
+            SnackBar(content: Text('Data Successfully Saved')),
           );
-          fetchProfileData(); // Ambil ulang data setelah berhasil disimpan
+          _fetchProfileData(); // Fetch data again after successful save
         } else {
-          throw Exception(
-              'Failed to update profile. Status code: ${response.statusCode}');
+          throw Exception('');
         }
       } catch (e) {
         setState(() {
-          _errorMessage = 'Error updating profile: $e';
+          _errorMessage = '';
         });
       }
     }
@@ -121,7 +116,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
     return Scaffold(
       backgroundColor: Colors.lightBlue[100],
       appBar: AppBar(
-        title: Text('Profil Saya'),
+        title: Text('My Profile'),
       ),
       body: Center(
         child: SingleChildScrollView(
@@ -132,7 +127,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
                 Text(
-                  'Profil Saya',
+                  'My Profile',
                   style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
                 ),
                 SizedBox(height: 8),
@@ -157,14 +152,12 @@ class _MyProfilePageState extends State<MyProfilePage> {
                   ),
                   SizedBox(height: 8),
                   Text(
-                    phoneNumber.isNotEmpty
-                        ? 'Telepon: $phoneNumber'
-                        : 'Telepon: -',
+                    phoneNumber.isNotEmpty ? 'Phone: $phoneNumber' : 'Phone: -',
                     style: TextStyle(fontSize: 18),
                   ),
                   SizedBox(height: 8),
                   Text(
-                    address.isNotEmpty ? 'Alamat: $address' : 'Alamat: -',
+                    address.isNotEmpty ? 'Address: $address' : 'Address: -',
                     style: TextStyle(fontSize: 18),
                   ),
                   SizedBox(height: 32),
@@ -174,7 +167,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
                         isEditing = true;
                       });
                     },
-                    child: Text('Edit Profil'),
+                    child: Text('Edit Profile'),
                     style: ElevatedButton.styleFrom(
                       padding:
                           EdgeInsets.symmetric(horizontal: 100, vertical: 15),
@@ -184,7 +177,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
                   SizedBox(height: 16),
                   ElevatedButton(
                     onPressed: handleLogout,
-                    child: Text('Keluar'),
+                    child: Text('Logout'),
                     style: ElevatedButton.styleFrom(
                       padding:
                           EdgeInsets.symmetric(horizontal: 100, vertical: 15),
@@ -195,12 +188,12 @@ class _MyProfilePageState extends State<MyProfilePage> {
                   TextFormField(
                     initialValue: username,
                     decoration: InputDecoration(
-                      labelText: 'Nama Pengguna',
+                      labelText: 'Username',
                       border: OutlineInputBorder(),
                     ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Harap masukkan nama pengguna Anda';
+                        return 'Please enter your username';
                       }
                       return null;
                     },
@@ -222,7 +215,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
                           value.isEmpty ||
                           !RegExp(r'^[a-zA-Z0-9._%+-]+@gmail\.com$')
                               .hasMatch(value)) {
-                        return 'Harap masukkan email yang valid dengan @gmail.com';
+                        return 'Please enter a valid email address ending with @gmail.com.';
                       }
                       return null;
                     },
@@ -236,14 +229,14 @@ class _MyProfilePageState extends State<MyProfilePage> {
                   TextFormField(
                     initialValue: phoneNumber,
                     decoration: InputDecoration(
-                      labelText: 'Nomor Telepon',
+                      labelText: 'Phone Number',
                       border: OutlineInputBorder(),
                     ),
                     validator: (value) {
                       if (value == null ||
                           value.isEmpty ||
                           !RegExp(r'^\d+$').hasMatch(value)) {
-                        return 'Harap masukkan nomor telepon yang valid';
+                        return 'Please enter a valid English phone number.';
                       }
                       return null;
                     },
@@ -257,7 +250,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
                   TextFormField(
                     initialValue: address,
                     decoration: InputDecoration(
-                      labelText: 'Alamat',
+                      labelText: 'Address',
                       border: OutlineInputBorder(),
                     ),
                     onChanged: (value) {
@@ -276,7 +269,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
                         });
                       }
                     },
-                    child: Text('Simpan'),
+                    child: Text('Save'),
                     style: ElevatedButton.styleFrom(
                       padding:
                           EdgeInsets.symmetric(horizontal: 100, vertical: 15),
